@@ -16,25 +16,6 @@ import numpy as np
 from numpy import *
 from scipy.optimize import fmin_l_bfgs_b
 
-#given a k(x) function, for example, k(x)=\sqrt{|sin(x^3+2x)|}
-def gradient_function(point,k_function,g_function):
-    dimension = len(point)
-    gradient = np.zeros(dimension)
-    k_vector = k_function(point)
-    g_matrix = g_function(point)
-
-
-
-   # print len(k_function(point))
-    #m,n=g_matrix.shape
-
-    for i in range(dimension):
-        gradient[i] = k_vector[i]
-
-        for j in range(3):
-            gradient[i] += math.sqrt(2.0*0.00001)*g_matrix[j][i]*np.random.normal(0, 0.001)
-
-    return gradient
 
 def compute_gradients(points, gradient_function,k_function,g_function):
     gradients=[]
