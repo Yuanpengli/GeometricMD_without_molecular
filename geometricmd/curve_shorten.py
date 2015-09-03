@@ -8,8 +8,8 @@ import logging
 # Load packages which are a part of GeometricMD
 #from geometricmd.animation import write_xyz_animation
 from geometricmd.geometry import convert_vector_to_atoms
-from k_g_function_example.k_g_function import k_function
-from k_g_function_example.k_g_function import g_function
+from k_g_function_example2.k_g_function import k_function
+from k_g_function_example2.k_g_function import g_function
 
 # Load additional packages and check if they are installed
 import numpy as np
@@ -83,12 +83,15 @@ def Q_I_metric(point,g_function):
     g_matrix=g_function(point)
     dimension=len(point)
     Q_matrix = np.zeros([dimension, dimension])
-    for i in range(dimension):
-        for j in range(dimension):
-            for k in range(3):
-                Q_matrix[i][j] += g_matrix[k][i] * g_matrix[k][j]
-            Q_matrix[i][j] +=  np.random.normal(0, 0.001)
-    rank = np.linalg.matrix_rank(Q_matrix)
+
+    Q_matrix=np.matrix(g_matrix)*np.matrix(g_matrix.transpose())
+  #  for i in range(dimension):
+   #     for j in range(dimension):
+    #        for k in range(3):
+     #           Q_matrix[i][j] += g_matrix[k][i] * g_matrix[k][j]
+     #       Q_matrix[i][j] +=  np.random.normal(0, 0.000001)
+   # rank = np.linalg.matrix_rank(Q_matrix)
+   # print rank
 
     Q_I_matrix = linalg.inv(Q_matrix)
     # c=np.linalg.det(Q_matrix)
@@ -194,7 +197,7 @@ def norm(x, matrix):
 
    # print matrix.dot(x)
 
-    return math.sqrt(np.absolute(np.inner(x, matrix.dot(x))))
+    return np.inner(x, matrix.dot(x))
 
 
 def norm_gradient(x, matrix):
@@ -215,7 +218,7 @@ def norm_gradient(x, matrix):
 
     a = (matrix + matrix.transpose())
 
-    return a.dot(x) / (2 * norm(x, matrix))
+    return a.dot(x) / (2 * (norm(x, matrix)*norm(x, matrix)))
 
 
 def length(x, start_point, end_point, rotation_matrix, total_number_of_points, co_dimension):
@@ -255,7 +258,7 @@ def length(x, start_point, end_point, rotation_matrix, total_number_of_points, c
 
     Q_I_matrixs = compute_Q_I_matrix(points, Q_I_metric)
     x_ks = compute_x_ks(points,k_function)
-    gradients=compute_gradients(points, gradient_function,k_function,g_function)
+   # gradients=compute_gradients(points, gradient_function,k_function,g_function)
 
 
 
@@ -265,6 +268,7 @@ def length(x, start_point, end_point, rotation_matrix, total_number_of_points, c
     # Compute quantities used to determine the length and gradient
    # n = np.subtract(points[1], points[0])
     n=x_ks[0]
+
     b = norm(n, Q_I_matrixs[0])
     #print len(Q_I_matrixs[3])
     c = norm_gradient(n, Q_I_matrixs[0])
@@ -290,7 +294,7 @@ def length(x, start_point, end_point, rotation_matrix, total_number_of_points, c
         l += v * norm(n, Q_I_matrixs[i])
 
         # Compute next gradient component and update gradient
-        g.append(rotation_matrix.transpose().dot(u * c - v * e)[1:])
+#        g.append(rotation_matrix.transpose().dot(u * c - v * e)[1:])
 #a[i][1] * (b + d) +
         # Pass back calculated values for efficiency
         b = d
@@ -298,7 +302,7 @@ def length(x, start_point, end_point, rotation_matrix, total_number_of_points, c
         u = v
 
        # print l
-    return 0.5 * l  , 0.5 * np.asarray(g).flatten()
+    return 0.5 * l  #, 0.5 * np.asarray(g).flatten()
 
 
 def get_rotation(start_point, end_point, dimension):
@@ -392,34 +396,6 @@ def find_geodesic_midpoint(start_point, end_point, number_of_inner_points, dimen
           The midpoint along the approximate local geodesic curve.
 
     """
-
-    # Define a function that returns sqrt(2(E-V)) and it's gradient based on a given configuration
-    def metric(point, Q_I_matrix, x_k,gradient):
-
-        # Update molecular configuration based on given configuration
-       # molecule.set_positions(convert_vector_to_atoms(point))
-
-        # Evaluate the value of sqrt(2(E-V)), replacing E-V with 1E-9 if V > E.
-        x_k = np.asarray(x_k)
-
-        Q_I_matrix = np.asarray(Q_I_matrix)
-
-        # print Q_I_matrix
-
-        b = Q_I_matrix.dot(x_k)
-        # print b
-
-        c = np.absolute(np.inner(x_k, b))
-
-        # print c
-
-        cf = math.sqrt(max([c, 1E-9]))
-
-        gradient=gradient.flatten()
-
-        # Return sqrt(2(E-V)) and it's gradient
-        return [cf,gradient/cf]
-
     # Obtain the transformation from dimension dimensional space to the tangent space of the line
     # joining start_point to end_point.
     Q = get_rotation(start_point, end_point, dimension)
@@ -431,7 +407,7 @@ def find_geodesic_midpoint(start_point, end_point, number_of_inner_points, dimen
                                                   end_point,
                                                   Q,
                                                   number_of_inner_points+2,
-                                                  dimension-1))
+                                                  dimension-1),approx_grad="TRUE")
     #approx_grad="TRUE"
 
     # If something went wrong with the L-BFGS algorithm print an error message for the end user

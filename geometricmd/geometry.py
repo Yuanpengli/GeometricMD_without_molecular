@@ -100,8 +100,10 @@ class Curve:
        #     raise ValueError('Calculator not attached to start configuration.')
 
         # Pass the initialiser arguments directly into the class attributes
-        self.start_point = np.asarray(convert_atoms_to_vector(start_point.get_positions()), dtype='float64')
-        self.end_point = np.asarray(convert_atoms_to_vector(end_point.get_positions()), dtype='float64')
+  #      self.start_point = np.asarray(convert_atoms_to_vector(start_point.get_positions()), dtype='float64')
+   #     self.end_point = np.asarray(convert_atoms_to_vector(end_point.get_positions()), dtype='float64')
+        self.start_point = start_point
+        self.end_point = end_point
         self.number_of_nodes = int(number_of_nodes)
         self.energy = energy
 

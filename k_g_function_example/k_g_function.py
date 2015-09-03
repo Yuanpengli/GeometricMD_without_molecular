@@ -24,5 +24,7 @@ def g_function(point):
         g_matrix[1][i] = math.sqrt(np.absolute(cos(point[i] ** (5))))
         g_matrix[2][i] = np.absolute(sin(point[i] ** (3)))
 
+    g_matrix=np.asarray(g_matrix)
+
     return g_matrix
 
