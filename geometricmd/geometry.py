@@ -80,7 +80,7 @@ class Curve:
           A dictionary containing the information from the configuration file.
 
     """
-    def __init__(self, start_point, end_point, number_of_nodes, energy):
+    def __init__(self, start_point, end_point, number_of_nodes):
         """The constructor for the Curve class.
 
         Args:
@@ -105,7 +105,7 @@ class Curve:
         self.start_point = start_point
         self.end_point = end_point
         self.number_of_nodes = int(number_of_nodes)
-        self.energy = energy
+       # self.energy = energy
 
         # Compute the tangent vector - the rescaled vector of the line joining the start and end points
         self.tangent = (1/(float(self.number_of_nodes)-1))*np.subtract(self.end_point, self.start_point)
