@@ -12,3 +12,7 @@ traj = Curve(start_point, end_point, 20, 1E+03)
 compute_trajectory(traj, 9, 10, {'processes': 1})
 
 print traj.points
+
+def write_file(traj.points):
+
+
