@@ -22,7 +22,7 @@ def g_function(point):
         # print np.dtype(point[i])
         g_matrix[0][i] = math.sqrt(np.absolute(sin(point[i] ** 2.0 + 2.0 * point[i])))
         g_matrix[1][i] = math.sqrt(np.absolute(cos(point[i] ** (5))))
-        g_matrix[2][i] = np.absolute(tan(point[i] ** (3)))
+        g_matrix[2][i] = np.absolute(sin(point[i] ** (3)))
 
     return g_matrix
 

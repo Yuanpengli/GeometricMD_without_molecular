@@ -190,8 +190,11 @@ def norm(x, matrix):
           The value of sqrt(<x, matrix*x>).
 
     """
+   # matrix=np.matrix(matrix)
 
-    return math.sqrt(np.inner(x, matrix.dot(x)))
+   # print matrix.dot(x)
+
+    return math.sqrt(np.absolute(np.inner(x, matrix.dot(x))))
 
 
 def norm_gradient(x, matrix):
@@ -215,7 +218,7 @@ def norm_gradient(x, matrix):
     return a.dot(x) / (2 * norm(x, matrix))
 
 
-def length(x, start_point, end_point, mass_matrix, rotation_matrix, total_number_of_points, co_dimension, metric):
+def length(x, start_point, end_point, rotation_matrix, total_number_of_points, co_dimension):
     """ This function computes the length of the local geodesic as a function of shifts from the line joining
     start_point to end_point. It also returns the gradient of this function for the L-BFGS method.
 
@@ -252,19 +255,21 @@ def length(x, start_point, end_point, mass_matrix, rotation_matrix, total_number
 
     Q_I_matrixs = compute_Q_I_matrix(points, Q_I_metric)
     x_ks = compute_x_ks(points,k_function)
-  #  print len(x_ks)
     gradients=compute_gradients(points, gradient_function,k_function,g_function)
 
 
 
     # Pre-compute the metric values to minimise repeated metric evaluations
-    a = compute_metric(points, metric, Q_I_matrixs, x_ks,gradients)
+    #a = compute_metric(points, metric, Q_I_matrixs, x_ks,gradients)
 
     # Compute quantities used to determine the length and gradient
-    n = np.subtract(points[1], points[0])
-    b = norm(n, mass_matrix)
-    c = norm_gradient(n, mass_matrix)
-    u = np.add(a[1][0],a[0][0])
+   # n = np.subtract(points[1], points[0])
+    n=x_ks[0]
+    b = norm(n, Q_I_matrixs[0])
+    #print len(Q_I_matrixs[3])
+    c = norm_gradient(n, Q_I_matrixs[0])
+   # u = np.add(a[1][0],a[0][0])
+    u=2.0
 
     # Initialise the length with the trapezoidal approximation of the first line segments length
     l = u * b
@@ -274,16 +279,18 @@ def length(x, start_point, end_point, mass_matrix, rotation_matrix, total_number
     for i in xrange(1, len(points)-1):
 
         # Compute the quantities needed for the next trapezoidal rule approximation.
-        n = np.subtract(points[i+1], points[i])
-        d = norm(n, mass_matrix)
-        e = norm_gradient(n, mass_matrix)
-        v = np.add(a[i+1][0],a[i][0])
+      #  n = np.subtract(points[i+1], points[i])
+        n = x_ks[i]
+        d = norm(n, Q_I_matrixs[i])
+        e = norm_gradient(n, Q_I_matrixs[i])
+       # v = np.add(a[i+1][0],a[i][0])
+        v=2.0
 
         # Add length of line segment to total length
-        l += v * norm(n, mass_matrix)
+        l += v * norm(n, Q_I_matrixs[i])
 
         # Compute next gradient component and update gradient
-        g.append(rotation_matrix.transpose().dot(a[i][1] * (b + d) +u * c - v * e)[1:])
+        g.append(rotation_matrix.transpose().dot(u * c - v * e)[1:])
 #a[i][1] * (b + d) +
         # Pass back calculated values for efficiency
         b = d
@@ -353,7 +360,7 @@ def get_rotation(start_point, end_point, dimension):
     return Q
 
 
-def find_geodesic_midpoint(start_point, end_point, number_of_inner_points, dimension, mass_matrix,
+def find_geodesic_midpoint(start_point, end_point, number_of_inner_points, dimension,
                            node_number, length_function):
     """ This function computes the local geodesic curve joining start_point to end_point using the L-BFGS method.
 
@@ -411,7 +418,7 @@ def find_geodesic_midpoint(start_point, end_point, number_of_inner_points, dimen
         gradient=gradient.flatten()
 
         # Return sqrt(2(E-V)) and it's gradient
-        return [cf,gradient/2]
+        return [cf,gradient/cf]
 
     # Obtain the transformation from dimension dimensional space to the tangent space of the line
     # joining start_point to end_point.
@@ -422,11 +429,9 @@ def find_geodesic_midpoint(start_point, end_point, number_of_inner_points, dimen
                                             x0=np.zeros(number_of_inner_points*(dimension-1)),
                                             args=(start_point,
                                                   end_point,
-                                                  mass_matrix,
                                                   Q,
                                                   number_of_inner_points+2,
-                                                  dimension-1,
-                                                  metric))
+                                                  dimension-1))
     #approx_grad="TRUE"
 
     # If something went wrong with the L-BFGS algorithm print an error message for the end user
@@ -483,7 +488,7 @@ def compute_trajectory(trajectory, local_num_nodes, tol, configuration, length_f
     # Compute the mass matrix for the Hamiltonian system
    # mass_matrix = np.diag(np.dstack((molecule.get_masses(),) * (dimension /
     #                                                           len(molecule.get_masses()))).flatten())
-    mass_matrix = np.eye(dimension)
+    #mass_matrix = np.eye(dimension)
     # Set counter for saving
     i = 0
 
@@ -520,7 +525,6 @@ def compute_trajectory(trajectory, local_num_nodes, tol, configuration, length_f
                                                                                  trajectory.points[node_number + 1],
                                                                                  local_num_nodes,
                                                                                  dimension,
-                                                                                 mass_matrix,
                                                                                  node_number,
                                                                                  length_function)[1])
 
