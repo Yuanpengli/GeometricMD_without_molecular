@@ -1,7 +1,5 @@
 __author__ = 'liyuanpeng'
 
-
-
 from geometricmd.curve_shorten import compute_trajectory
 from geometricmd.geometry import Curve
 import numpy as np
@@ -13,7 +11,7 @@ global_number_node=20
 traj = Curve(start_point, end_point, global_number_node)
 tol=10
 
-compute_trajectory(traj, 9, 10, {'processes': 1})
+compute_trajectory(traj, 9, tol, {'processes': 1})
 
 print traj.points
 

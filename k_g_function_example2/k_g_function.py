@@ -1,5 +1,4 @@
 __author__ = 'liyuanpeng'
-__author__ = 'liyuanpeng'
 import math
 import logging
 import numpy as np

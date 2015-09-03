@@ -17,14 +17,7 @@ from numpy import *
 from scipy.optimize import fmin_l_bfgs_b
 
 
-def compute_gradients(points, gradient_function,k_function,g_function):
-    gradients=[]
-    for point in points:
-        gradients.append(gradient_function(point,k_function,g_function))
-
-    return gradients
-
-#for a sequence of points in the local geodesic, compute the each k(points) as set
+#for a sequence of points in the local geodesic, compute the each \dot{x}-k(x) as set
 def compute_x_ks(points, k_function):
     x_ks = []
     t = points[1]
@@ -66,13 +59,6 @@ def Q_I_metric(point,g_function):
     Q_matrix = np.zeros([dimension, dimension])
 
     Q_matrix=np.matrix(g_matrix)*np.matrix(g_matrix.transpose())
-  #  for i in range(dimension):
-   #     for j in range(dimension):
-    #        for k in range(3):
-     #           Q_matrix[i][j] += g_matrix[k][i] * g_matrix[k][j]
-     #       Q_matrix[i][j] +=  np.random.normal(0, 0.000001)
-   # rank = np.linalg.matrix_rank(Q_matrix)
-   # print rank
 
     Q_I_matrix = linalg.inv(Q_matrix)
     # c=np.linalg.det(Q_matrix)
@@ -127,36 +113,6 @@ def generate_points(x, start_point, end_point, rotation_matrix, total_number_of_
         points[i+1] = np.add(points[i+1], shift)
 
     return points
-
-
-def compute_metric(points, metric_function, Q_I_matrixs, x_k,gradients):
-    """ Takes a list of NumPy arrays describing points molecular configurations, evaluates the metric at each point and
-    returns a list of metric values at those points.
-
-    Args:
-      points (list) :
-          A list of NumPy arrays describing molecular configurations.
-      metric_function (func) :
-          A Python function which gives the value of sqrt(2(E - V)) at a given point.
-
-
-    Returns:
-      list :
-          A list of metric values at the corresponding points.
-
-    """
-
-    # Initialise the list to store metric values
-    metric = []
-
-    # For each point, compute the metric at that point
-    i = 0
-    for point in points:
-       # gradient=gradient_function(point,g_function,k_function)
-        metric.append(metric_function(point, Q_I_matrixs[i], x_k[i],gradients[i]))
-        i += 1
-        # print metric
-    return metric
 
 
 def norm(x, matrix):
@@ -358,13 +314,6 @@ def find_geodesic_midpoint(start_point, end_point, number_of_inner_points, dimen
           The number of nodes along the curve, less the end points.
       dimension (int) :
           The dimension of the problem. Computed from the atomistic simulation environment.
-      mass_matrix (numpy.array) :
-          A diagonal NumPy array containing the masses of the molecular system as computed in the SimulationClient
-          object.
-      molecule (ase.atoms) :
-          The ASE atoms object corresponding to the molecule being simulated.
-      energy (float) :
-          The total energy of the system.
       node_number (int) :
           The node number for which we are calculating a new position for.
       length_function (func) :
