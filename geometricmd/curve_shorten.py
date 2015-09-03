@@ -32,7 +32,7 @@ def gradient_function(point,k_function,g_function):
         gradient[i] = k_vector[i]
 
         for j in range(3):
-            gradient[i] += math.sqrt(2.0*0.0001)*g_matrix[j][i]*np.random.normal(0, 0.001)
+            gradient[i] += math.sqrt(2.0*0.00001)*g_matrix[j][i]*np.random.normal(0, 0.001)
 
     return gradient
 

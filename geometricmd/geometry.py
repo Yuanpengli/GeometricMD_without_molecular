@@ -96,8 +96,8 @@ class Curve:
         """
 
         # Check if calculator attached to start_point, if not then raise an error.
-        if start_point.get_calculator() == None:
-            raise ValueError('Calculator not attached to start configuration.')
+      #  if start_point.get_calculator() == None:
+       #     raise ValueError('Calculator not attached to start configuration.')
 
         # Pass the initialiser arguments directly into the class attributes
         self.start_point = np.asarray(convert_atoms_to_vector(start_point.get_positions()), dtype='float64')
