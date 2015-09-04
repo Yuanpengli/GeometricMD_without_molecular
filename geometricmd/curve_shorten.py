@@ -49,17 +49,26 @@ def Q_I_metric(point,g_function):
 
     Return :
         Q_I_matrix (numpy.array.matrix):
-            Q_I_matrix is given by the certain point and function g(x). Q=g*g^T+\epsilon norm(0,0.001)
+            Q_I_matrix is given by the certain point and function g(x). Q=g*g^T
 
 
 
     """
     g_matrix=g_function(point)
     dimension=len(point)
+    #print dimension
     Q_matrix = np.zeros([dimension, dimension])
 
     Q_matrix=np.matrix(g_matrix)*np.matrix(g_matrix.transpose())
 
+   # Q_matrix=np.matrix(g_matrix.transpose())*np.matrix(g_matrix)
+
+    #Q_matrix=np.add(Q_matrix,np.random.normal(0,0.00001)*np.random.rand(dimension,dimension))
+
+  #  rank=np.linalg.matrix_rank(Q_matrix)
+
+    #print Q_matrix.shape
+   # print Q_matrix.shape
     Q_I_matrix = linalg.inv(Q_matrix)
     # c=np.linalg.det(Q_matrix)
     return Q_I_matrix
@@ -137,27 +146,6 @@ def norm(x, matrix):
     return np.inner(x, matrix.dot(x))
 
 
-def norm_gradient(x, matrix):
-    """ Computes the gradient of sqrt(<x, matrix*x>).
-
-    Args:
-      x (numpy.array) :
-          A vector, stored as a NumPy array, to compute the norm for.
-      matrix (numpy.array) :
-          A matrix, stored as a NumPy array, used in the computation of <x, matrix*x>.
-
-
-    Returns:
-      numpy.array :
-          The gradient of sqrt(<x, matrix*x>).
-
-    """
-
-    a = (matrix + matrix.transpose())
-
-    return a.dot(x) / (2 * (norm(x, matrix)*norm(x, matrix)))
-
-
 def length(x, start_point, end_point, rotation_matrix, total_number_of_points, co_dimension):
     """ This function computes the length of the local geodesic as a function of shifts from the line joining
     start_point to end_point. It also returns the gradient of this function for the L-BFGS method.
@@ -206,16 +194,12 @@ def length(x, start_point, end_point, rotation_matrix, total_number_of_points, c
    # n = np.subtract(points[1], points[0])
     n=x_ks[0]
 
-    b = norm(n, Q_I_matrixs[0])
-    #print len(Q_I_matrixs[3])
-    c = norm_gradient(n, Q_I_matrixs[0])
-   # u = np.add(a[1][0],a[0][0])
-    u=2.0
+    l = norm(n, Q_I_matrixs[0])
+
 
     # Initialise the length with the trapezoidal approximation of the first line segments length
-    l = u * b
     # Initialise a list to store the gradient
-    g = []
+    #g = []
 
     for i in xrange(1, len(points)-1):
 
@@ -223,23 +207,16 @@ def length(x, start_point, end_point, rotation_matrix, total_number_of_points, c
       #  n = np.subtract(points[i+1], points[i])
         n = x_ks[i]
         d = norm(n, Q_I_matrixs[i])
-        e = norm_gradient(n, Q_I_matrixs[i])
-       # v = np.add(a[i+1][0],a[i][0])
-        v=2.0
-
         # Add length of line segment to total length
-        l += v * norm(n, Q_I_matrixs[i])
+        l += d
 
         # Compute next gradient component and update gradient
 #        g.append(rotation_matrix.transpose().dot(u * c - v * e)[1:])
 #a[i][1] * (b + d) +
         # Pass back calculated values for efficiency
-        b = d
-        c = e
-        u = v
 
        # print l
-    return 0.5 * l  #, 0.5 * np.asarray(g).flatten()
+    return l  #, 0.5 * np.asarray(g).flatten()
 
 
 def get_rotation(start_point, end_point, dimension):

@@ -6,11 +6,11 @@ import numpy as np
 import time
 start = time.clock()
 
-start_point = np.asarray([2.0,5.5,3.3])
-end_point = np.asarray([100.0,99.0,98.0])
-global_number_node=16
+start_point = np.asarray([2.0,5.5])
+end_point = np.asarray([100.0,99.0])
+global_number_node=20
 traj = Curve(start_point, end_point, global_number_node)
-tol=5
+tol=0.01
 
 compute_trajectory(traj, 9, tol, {'processes': 1})
 
